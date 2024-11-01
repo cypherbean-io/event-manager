@@ -53,6 +53,7 @@ contents = CSV.open(
 )
 
 registration_hours = Hash.new(0)
+registration_days = Hash.new(0)
 
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
@@ -67,6 +68,7 @@ contents.each do |row|
   reg_date = row[:regdate]
   reg_time = Time.strptime(reg_date, '%m/%d/%y %H:%M')
   registration_hours[reg_time.hour] += 1
+  registration_days[reg_time.wday] += 1
 
   form_letter = erb_template.result(binding)
 
@@ -74,4 +76,6 @@ contents.each do |row|
 end
 
 peak_hour = registration_hours.max_by { |hour, count| count }[0]
-puts "The peak registration hour is #{peak_hour}:00."
+peak_day = Date::DAYNAMES[registration_days.max_by { |day, count| count }[0]]
+
+puts "The peak registration hour is #{peak_hour}:00. The peak registration day is #{peak_day}."
